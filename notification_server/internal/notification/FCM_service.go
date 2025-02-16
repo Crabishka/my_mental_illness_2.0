@@ -4,7 +4,7 @@ import (
 	"context"
 	"simple-service/internal/device"
 
-	"firebase.google.com/go/v4"
+	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
 	"google.golang.org/api/option"
 )
@@ -33,8 +33,8 @@ func NewService(credentialsFile string, deviceRepo device.DeviceRepository) (*Se
 	}, nil
 }
 
-func (s *Service) SendToDevice(ctx context.Context, deviceID int64, title, body string) error {
-	device, err := s.deviceRepo.GetByID(deviceID)
+func (s *Service) SendToDevice(ctx context.Context, deviceUUID string, title, body string) error {
+	device, err := s.deviceRepo.GetByUUID(deviceUUID)
 	if err != nil {
 		return err
 	}

@@ -13,8 +13,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         
-        // Получаем данные из сообщения
-        val title = remoteMessage.notification?.title ?: "Новое сообщение"
+        // Получаем данные из уведомления
+        val title = remoteMessage.notification?.title ?: "Новое уведомление"
         val body = remoteMessage.notification?.body ?: ""
         
         // Показываем уведомление
@@ -26,11 +26,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // Здесь вы можете отправить токен на свой сервер
     }
 
-    private fun showNotification(title: String, body: String) {
+    private fun showNotification(title: String, message: String) {
+        val channelId = "default"
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channelId = "default_channel"
 
-        // Создаем канал уведомлений для Android 8.0 и выше
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
@@ -40,11 +39,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        // Создаем уведомление
         val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle(title)
-            .setContentText(body)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentText(message)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setAutoCancel(true)
             .build()
 

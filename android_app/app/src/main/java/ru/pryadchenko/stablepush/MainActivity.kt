@@ -1,11 +1,15 @@
 package ru.pryadchenko.stablepush
 
-import android.os.Bundle
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -20,7 +24,7 @@ import ru.pryadchenko.stablepush.api.DeviceApi
 import ru.pryadchenko.stablepush.api.DeviceRequest
 import ru.pryadchenko.stablepush.api.NotificationRequest
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
     private val api = Retrofit.Builder()
         .baseUrl("https://4272517-lw36995.twc1.net/") // localhost для эмулятора
         .addConverterFactory(GsonConverterFactory.create())
@@ -64,6 +68,14 @@ class MainActivity : AppCompatActivity() {
                 registerDevice(token)
             }
         }
+
+        // Запрашиваем разрешение на уведомления для Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            requestPermissions(
+                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                1
+            )
+        }
     }
 
     private fun registerDevice(token: String) {
@@ -98,17 +110,54 @@ class MainActivity : AppCompatActivity() {
                             body = "Привет от меня!"
                         )
                     )
-                    if (response.isSuccessful) {
-                        println("Notification sent successfully")
-                    } else {
-                        println("Failed to send notification: ${response.errorBody()?.string()}")
+                    runOnUiThread {
+                        if (response.isSuccessful) {
+                            Toast.makeText(this@MainActivity, "Уведомление отправлено", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "Ошибка отправки: ${response.errorBody()?.string()}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 } catch (e: Exception) {
-                    println("Error sending notification: ${e.message}")
+                    e.printStackTrace()
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Ошибка: ${e.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         } ?: run {
             Toast.makeText(this, "Устройство еще не зарегистрировано", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showNotification(title: String, message: String) {
+        val channelId = "default"
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        // Создаем канал уведомлений для Android 8.0 и выше
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Default Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(this, channelId)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setAutoCancel(true)
+            .build()
+
+        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
 }
