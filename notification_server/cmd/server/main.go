@@ -9,7 +9,7 @@ import (
 	"os"
 	"strconv"
 
-	"simple-service/internal/api/v1"
+	v1 "simple-service/internal/api/v1"
 	"simple-service/internal/device"
 	"simple-service/internal/notification"
 
@@ -77,10 +77,17 @@ func main() {
 		httpSwagger.URL("/swagger/doc.json"),
 	))
 
-	// Запускаем сервер на порту 8080
-	log.Println("Сервер запущен на http://localhost:8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
+	certFile := os.Getenv("SSL_CERT")
+	keyFile := os.Getenv("SSL_KEY")
+
+	server := &http.Server{
+		Addr:    ":443",
+		Handler: nil, // используем DefaultServeMux
+	}
+
+	log.Printf("Starting HTTPS server on :443")
+	if err := server.ListenAndServeTLS(certFile, keyFile); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }
 

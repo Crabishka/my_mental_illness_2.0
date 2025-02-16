@@ -5,14 +5,17 @@ services:
     build: .
     restart: always
     ports:
-      - "8080:8080"
+      - "443:443"  # Меняем порт на 443 для HTTPS
     environment:
       - DB_HOST=postgres
       - DB_USER=postgres
       - DB_PASSWORD=your_secure_password  # Измените на безопасный пароль
       - DB_NAME=devices_db
+      - SSL_CERT=/app/certs/cert.pem
+      - SSL_KEY=/app/certs/key.pem
     volumes:
       - ./fcm-config.json:/app/fcm-config.json
+      - ./certs:/app/certs  # Монтируем директорию с сертификатами
     depends_on:
       - postgres
 
