@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	v1 "simple-service/internal/api/v1"
 	"simple-service/internal/device"
@@ -65,14 +66,25 @@ func init() {
 	notificationHandler = v1.NewNotificationHandler(notificationService)
 }
 
+func loggingMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
+		log.Printf("Request: %s %s", r.Method, r.URL.Path)
+		next.ServeHTTP(w, r)
+
+		log.Printf("Response: %s %s - %v", r.Method, r.URL.Path, time.Since(start))
+	}
+}
+
 func main() {
-	// Регистрируем обработчики маршрутов
-	http.HandleFunc("/", homeHandler)
-	http.HandleFunc("/health", healthCheckHandler)
-	http.HandleFunc("/devices", deviceHandler.HandleDevices)
-	http.HandleFunc("/devices/", deviceHandler.HandleDevice)
-	http.HandleFunc("/notify/device/", notificationHandler.SendToDevice)
-	http.HandleFunc("/notify/all", notificationHandler.SendToAll)
+	// Обернем все обработчики в middleware
+	http.HandleFunc("/", loggingMiddleware(homeHandler))
+	http.HandleFunc("/health", loggingMiddleware(healthCheckHandler))
+	http.HandleFunc("/devices", loggingMiddleware(deviceHandler.HandleDevices))
+	http.HandleFunc("/devices/", loggingMiddleware(deviceHandler.HandleDevice))
+	http.HandleFunc("/notify/device/", loggingMiddleware(notificationHandler.SendToDevice))
+	http.HandleFunc("/notify/all", loggingMiddleware(notificationHandler.SendToAll))
 
 	// Добавляем Swagger UI
 	http.HandleFunc("/swagger/*", httpSwagger.Handler(

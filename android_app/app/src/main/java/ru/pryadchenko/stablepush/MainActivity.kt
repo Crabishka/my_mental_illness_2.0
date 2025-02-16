@@ -22,7 +22,7 @@ import ru.pryadchenko.stablepush.api.NotificationRequest
 
 class MainActivity : AppCompatActivity() {
     private val api = Retrofit.Builder()
-        .baseUrl("http://188.225.86.55:8080/") // localhost для эмулятора
+        .baseUrl("https://4272517-lw36995.twc1.net/") // localhost для эмулятора
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(DeviceApi::class.java)
