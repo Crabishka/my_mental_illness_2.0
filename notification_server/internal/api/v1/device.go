@@ -3,7 +3,6 @@ package v1
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"simple-service/internal/device"
@@ -93,45 +92,39 @@ func (h *DeviceHandler) CreateDevice(w http.ResponseWriter, r *http.Request) {
 // @Summary     Обработка запросов к конкретному устройству
 // @Description Обрабатывает GET и DELETE запросы для получения информации об устройстве и его удаления
 // @Tags        devices
-// @Param       id path int true "ID устройства"
+// @Param       uuid path string true "UUID устройства"
 // @Success     200 {object} device.Device
 // @Failure     400 {object} ErrorResponse
 // @Failure     404 {object} ErrorResponse
-// @Router      /devices/{id} [get]
+// @Router      /devices/{uuid} [get]
 func (h *DeviceHandler) HandleDevice(w http.ResponseWriter, r *http.Request) {
-	idStr := strings.TrimPrefix(r.URL.Path, "/devices/")
-	if idStr == "" {
-		http.Error(w, "Device ID is required", http.StatusBadRequest)
+	uuid := strings.TrimPrefix(r.URL.Path, "/devices/")
+	if uuid == "" {
+		http.Error(w, "Device UUID is required", http.StatusBadRequest)
 		return
 	}
 
 	switch r.Method {
 	case http.MethodGet:
-		h.GetDevice(w, r, idStr)
+		h.GetDevice(w, r, uuid)
 	case http.MethodDelete:
-		h.DeleteDevice(w, r, idStr)
+		h.DeleteDevice(w, r, uuid)
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
 }
 
 // @Summary     Получить информацию об устройстве
-// @Description Возвращает детальную информацию об устройстве по его ID
+// @Description Возвращает детальную информацию об устройстве по его UUID
 // @Tags        devices
 // @Produce     json
-// @Param       id path int true "ID устройства"
+// @Param       uuid path string true "UUID устройства"
 // @Success     200 {object} device.Device
 // @Failure     400 {object} ErrorResponse
 // @Failure     404 {object} ErrorResponse
-// @Router      /devices/{id} [get]
-func (h *DeviceHandler) GetDevice(w http.ResponseWriter, r *http.Request, idStr string) {
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		http.Error(w, "Invalid device ID", http.StatusBadRequest)
-		return
-	}
-
-	device, err := h.store.GetByID(id)
+// @Router      /devices/{uuid} [get]
+func (h *DeviceHandler) GetDevice(w http.ResponseWriter, r *http.Request, uuid string) {
+	device, err := h.store.GetByUUID(uuid)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -142,21 +135,15 @@ func (h *DeviceHandler) GetDevice(w http.ResponseWriter, r *http.Request, idStr 
 }
 
 // @Summary     Удалить устройство
-// @Description Удаляет устройство из системы по его ID
+// @Description Удаляет устройство из системы по его UUID
 // @Tags        devices
-// @Param       id path int true "ID устройства"
+// @Param       uuid path string true "UUID устройства"
 // @Success     204 "No Content"
 // @Failure     400 {object} ErrorResponse
 // @Failure     404 {object} ErrorResponse
-// @Router      /devices/{id} [delete]
-func (h *DeviceHandler) DeleteDevice(w http.ResponseWriter, r *http.Request, idStr string) {
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		http.Error(w, "Invalid device ID", http.StatusBadRequest)
-		return
-	}
-
-	if err := h.store.Delete(id); err != nil {
+// @Router      /devices/{uuid} [delete]
+func (h *DeviceHandler) DeleteDevice(w http.ResponseWriter, r *http.Request, uuid string) {
+	if err := h.store.Delete(uuid); err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}

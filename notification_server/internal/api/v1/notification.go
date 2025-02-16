@@ -3,7 +3,6 @@ package v1
 import (
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"simple-service/internal/notification"
 )
@@ -39,10 +38,9 @@ func (h *NotificationHandler) SendToDevice(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	idStr := r.URL.Path[len("/notify/device/"):]
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		http.Error(w, "Invalid device ID", http.StatusBadRequest)
+	uuid := r.URL.Path[len("/notify/device/"):]
+	if uuid == "" {
+		http.Error(w, "Invalid device UUID", http.StatusBadRequest)
 		return
 	}
 
@@ -52,7 +50,7 @@ func (h *NotificationHandler) SendToDevice(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	if err := h.service.SendToDevice(r.Context(), id, req.Title, req.Body); err != nil {
+	if err := h.service.SendToDevice(r.Context(), uuid, req.Title, req.Body); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
