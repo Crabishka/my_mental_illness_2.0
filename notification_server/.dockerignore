@@ -1,0 +1,19 @@
+# Игнорируем Git директорию
+.git
+.gitignore
+
+# Игнорируем бинарные файлы
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Игнорируем временные файлы
+*.test
+*.out
+.DS_Store
+
+# Исключаем файл учетных данных Firebase из игнорирования
+!firebase-credentials.json
+!stableconnection-firebase-adminsdk-fbsvc-7af1d2c74b.json 

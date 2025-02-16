@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "958688847899",
+    "project_id": "stableconnection",
+    "storage_bucket": "stableconnection.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958688847899:android:7b43bae41e8a1e8a1370be",
+        "android_client_info": {
+          "package_name": "ru.pryadchenko.stable"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCOmWp3PlMRrZqryXOy1QRATeV4xx8XXE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:958688847899:android:b1314300b41dd5db1370be",
+        "android_client_info": {
+          "package_name": "ru.pryadchenko.stablepush"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCOmWp3PlMRrZqryXOy1QRATeV4xx8XXE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
