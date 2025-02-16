@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -85,10 +86,14 @@ func main() {
 		log.Fatal("SSL_CERT and SSL_KEY environment variables are required")
 	}
 
-	mux := http.DefaultServeMux
+	tlsConfig := &tls.Config{
+		MinVersion: tls.VersionTLS12,
+	}
+
 	server := &http.Server{
-		Addr:    ":443",
-		Handler: mux,
+		Addr:      ":443",
+		Handler:   http.DefaultServeMux,
+		TLSConfig: tlsConfig,
 	}
 
 	log.Printf("Starting HTTPS server on https://%s", os.Getenv("HOST"))
@@ -109,6 +114,15 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+	if r.Method == "OPTIONS" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	json.NewEncoder(w).Encode(Response{
 		Message: "Сервис работает нормально",
 		Status:  true,

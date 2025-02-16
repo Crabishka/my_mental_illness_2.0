@@ -5,7 +5,7 @@ services:
     build: .
     restart: always
     ports:
-      - "443:443"  # Должно быть именно так
+      - "443:443"
     environment:
       - HOST=4272517-lw36995.twc1.net
       - DB_HOST=postgres
