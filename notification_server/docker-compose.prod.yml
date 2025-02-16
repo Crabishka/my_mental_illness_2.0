@@ -5,8 +5,9 @@ services:
     build: .
     restart: always
     ports:
-      - "443:443"  # Меняем порт на 443 для HTTPS
+      - "443:443"  # Должно быть именно так
     environment:
+      - HOST=4272517-lw36995.twc1.net
       - DB_HOST=postgres
       - DB_USER=postgres
       - DB_PASSWORD=your_secure_password  # Измените на безопасный пароль

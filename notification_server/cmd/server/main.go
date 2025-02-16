@@ -23,7 +23,8 @@ import (
 // @version         1.0
 // @description     API для управления устройствами и отправки push-уведомлений
 
-// @host      localhost:8080
+// @host      4272517-lw36995.twc1.net
+// @schemes   https
 // @BasePath  /
 
 type Response struct {
@@ -80,12 +81,17 @@ func main() {
 	certFile := os.Getenv("SSL_CERT")
 	keyFile := os.Getenv("SSL_KEY")
 
-	server := &http.Server{
-		Addr:    ":443",
-		Handler: nil, // используем DefaultServeMux
+	if certFile == "" || keyFile == "" {
+		log.Fatal("SSL_CERT and SSL_KEY environment variables are required")
 	}
 
-	log.Printf("Starting HTTPS server on :443")
+	mux := http.DefaultServeMux
+	server := &http.Server{
+		Addr:    ":443",
+		Handler: mux,
+	}
+
+	log.Printf("Starting HTTPS server on https://%s", os.Getenv("HOST"))
 	if err := server.ListenAndServeTLS(certFile, keyFile); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
